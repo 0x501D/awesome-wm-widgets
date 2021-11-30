@@ -36,7 +36,7 @@ s.mytasklist, -- Middle widget
         },
 ```
 
-Note that widget uses following command the get the current volume: `amixer -D pulse sget Master`, so please make sure that it works for you, otherwise you need to set parametr `device = 'default'`.
+Note that widget uses following command the get the current volume: `amixer -D pulse sget Master`, so please make sure that it works for you, otherwise you need to set parameter `device = 'default'`.
 
 ### Shortcuts
 
