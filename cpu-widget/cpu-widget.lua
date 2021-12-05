@@ -29,6 +29,10 @@ local cpu_rows = {
     spacing = 4,
     layout = wibox.layout.fixed.vertical,
 }
+local cpu_freq_rows = {
+    spacing = 4,
+    layout = wibox.layout.fixed.vertical,
+}
 local is_update = true
 local process_rows = {
     layout = wibox.layout.fixed.vertical,
@@ -194,7 +198,7 @@ local function worker(user_args)
     local maincpu = {}
     local function get_cpuload_data(widget, stdout)
         local _, user, nice, system, idle, iowait, irq, softirq, steal, _, _ =
-        stdout:match('(%w+)%s+(%d+)%s(%d+)%s(%d+)%s(%d+)%s(%d+)%s(%d+)%s(%d+)%s(%d+)%s(%d+)%s(%d+)')
+            stdout:match('(%w+)%s+(%d+)%s(%d+)%s(%d+)%s(%d+)%s(%d+)%s(%d+)%s(%d+)%s(%d+)%s(%d+)%s(%d+)')
 
         local total = user + nice + system + idle + iowait + irq + softirq + steal
 
@@ -272,7 +276,7 @@ local function worker(user_args)
                         }
 
                         row:ajust_ratio(2, 0.15, 0.35, 0.5)
-                        cpu_rows[n_cpu] = row
+                        cpu_freq_rows[n_cpu] = row
                         n_cpu = n_cpu + 1
                     end
                 end
@@ -404,7 +408,7 @@ local function worker(user_args)
                             color = beautiful.bg_focus,
                             widget = wibox.widget.separator
                         },
-                        cpu_rows,
+                        cpu_freq_rows,
                         {
                             orientation = 'horizontal',
                             forced_height = 15,
