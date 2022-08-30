@@ -141,7 +141,22 @@ local function to_time_ago(seconds)
     end
 end
 
+local function fix_unicode(text)
+    local symbols="<>"
+
+    symbols:gsub(".", function(c)
+        local idx = text:find(c)
+        if idx ~= nil then
+            text = text:gsub(c, "_")
+        end
+    end)
+
+    return text
+end
+
 local function ellipsize(text, length)
+    text = fix_unicode(text)
+
     return (text:len() > length and length > 0)
             and text:sub(0, length - 3) .. '...'
             or text
