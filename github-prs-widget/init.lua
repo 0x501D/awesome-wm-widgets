@@ -25,7 +25,7 @@ local WIDGET_DIR = HOME_DIR .. '/.config/awesome/awesome-wm-widgets/github-prs-w
 local ICONS_DIR = WIDGET_DIR .. 'icons/'
 
 local AVATARS_DIR = HOME_DIR .. '/.cache/awmw/github-widget/avatars/'
-local DOWNLOAD_AVATAR_CMD = [[sh -c "curl -L --create-dirs -o ''\\]] .. AVATARS_DIR .. [[%s %s"]]
+local DOWNLOAD_AVATAR_CMD = "curl -L --create-dirs -o " .. AVATARS_DIR .. "%s %s"
 
 local GET_PRS_CMD = "gh api -X GET search/issues "
         .. "-f 'q=review-requested:%s is:unmerged is:open' "
@@ -87,7 +87,9 @@ local github_widget = wibox.widget {
             self:get_children_by_id('icon')[1]:set_opacity(1)
             self:get_children_by_id('icon')[1]:emit_signal('widget:redraw_needed')
         else
-            self.txt:set_text('')
+            if self.txt then
+                self.txt:set_text('')
+            end
             self:get_children_by_id('error_marker')[1]:set_visible(true)
             self:get_children_by_id('icon')[1]:set_opacity(0.2)
             self:get_children_by_id('icon')[1]:emit_signal('widget:redraw_needed')
@@ -203,7 +205,7 @@ local function worker(user_args)
 
         if stderr ~= '' then
             if not warning_shown then
-                show_warning(stderr)
+                --show_warning(stderr)
                 warning_shown = true
                 widget:is_everything_ok(false)
                 tooltip:add_to_object(widget)
@@ -252,6 +254,14 @@ local function worker(user_args)
             local index = string.find(pr.repository_url, "/[^/]*$")
             local repo = string.sub(pr.repository_url, index + 1)
 
+            if not gfs.file_readable(path_to_avatar) then
+                os.execute(string.format(
+                        DOWNLOAD_AVATAR_CMD,
+                        pr.user.id,
+                        pr.user.avatar_url)
+                )
+            end
+
             local row = wibox.widget {
                 {
                     {
@@ -259,8 +269,8 @@ local function worker(user_args)
                             {
                                 resize = true,
                                 image = path_to_avatar,
-                                forced_width = 40,
-                                forced_height = 40,
+                                forced_width = 70,
+                                forced_height = 70,
                                 widget = wibox.widget.imagebox
                             },
                             id = 'avatar',
@@ -272,7 +282,8 @@ local function worker(user_args)
                                 id = 'title',
                                 markup = '<b>' .. ellipsize(pr.title, 60) .. '</b>',
                                 widget = wibox.widget.textbox,
-                                forced_width = 400
+                                forced_width = 400,
+                                font = "Droid Sans 14"
                             },
                             {
                                 {
@@ -286,7 +297,8 @@ local function worker(user_args)
                                         },
                                         {
                                             text = repo,
-                                            widget = wibox.widget.textbox
+                                            widget = wibox.widget.textbox,
+                                            font = "Droid Sans 12"
                                         },
                                         spacing = 4,
                                         expand = 'none',
@@ -302,7 +314,8 @@ local function worker(user_args)
                                         },
                                         {
                                             text = pr.user.login,
-                                            widget = wibox.widget.textbox
+                                            widget = wibox.widget.textbox,
+                                            font = "Droid Sans 12"
                                         },
                                         spacing = 4,
                                         expand = 'none',
@@ -323,7 +336,8 @@ local function worker(user_args)
                                         },
                                         {
                                             text = to_time_ago(os.difftime(current_time, parse_date(pr.created_at))),
-                                            widget = wibox.widget.textbox
+                                            widget = wibox.widget.textbox,
+                                            font = "Droid Sans 12",
                                         },
                                         spacing = 4,
                                         expand = 'none',
@@ -340,7 +354,8 @@ local function worker(user_args)
                                         },
                                         {
                                             text = pr.comments,
-                                            widget = wibox.widget.textbox
+                                            widget = wibox.widget.textbox,
+                                            font = "Droid Sans 12"
                                         },
                                         spacing = 4,
                                         expand = 'none',
@@ -364,15 +379,6 @@ local function worker(user_args)
                 bg = _config.bg_normal,
                 widget = wibox.container.background
             }
-
-            if not gfs.file_readable(path_to_avatar) then
-                spawn.easy_async(string.format(
-                        DOWNLOAD_AVATAR_CMD,
-                        pr.user.id,
-                        pr.user.avatar_url), function()
-                    row:get_children_by_id('avatar')[1]:set_image(path_to_avatar)
-                end)
-            end
 
             row:connect_signal("mouse::enter", function(c) c:set_bg(_config.bg_focus) end)
             row:connect_signal("mouse::leave", function(c) c:set_bg(_config.bg_normal) end)
