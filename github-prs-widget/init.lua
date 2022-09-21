@@ -269,8 +269,8 @@ local function worker(user_args)
                             {
                                 resize = true,
                                 image = path_to_avatar,
-                                forced_width = 70,
-                                forced_height = 70,
+                                forced_width = 69,
+                                forced_height = 69,
                                 widget = wibox.widget.imagebox
                             },
                             id = 'avatar',
