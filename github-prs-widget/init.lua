@@ -439,7 +439,6 @@ local function worker(user_args)
                             popup.visible = not popup.visible
                             github_widget:set_bg('#00000000')
                         else
-                            github_widget:set_bg(beautiful.bg_focus)
                             popup:move_next_to(mouse.current_widget_geometry)
                         end
                     end)
