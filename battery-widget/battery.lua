@@ -85,8 +85,6 @@ local function worker(user_args)
                 text =  stdout,
                 font = font,
                 title = "Battery status",
-                icon = path_to_icons .. batteryType .. ".svg",
-                icon_size = dpi(16),
                 position = position,
                 timeout = 5, hover_timeout = 0.5,
                 width = 400,
