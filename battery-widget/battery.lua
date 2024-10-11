@@ -26,7 +26,7 @@ local battery_widget = {}
 local function worker(user_args)
     local args = user_args or {}
 
-    local font = args.font or 'Play 8'
+    local font = args.font or 'Droid Sans 30'
     local path_to_icons = args.path_to_icons or "/usr/share/icons/Arc/status/symbolic/"
     local show_current_level = args.show_current_level or false
     local margin_left = args.margin_left or 0
@@ -58,7 +58,8 @@ local function worker(user_args)
         {
             id = "icon",
             widget = wibox.widget.imagebox,
-            resize = true
+            resize = true,
+            forced_height = 32
         },
         valigh = 'center',
         layout = wibox.container.place,
@@ -82,12 +83,13 @@ local function worker(user_args)
             naughty.destroy(notification)
             notification = naughty.notify{
                 text =  stdout,
+                font = font,
                 title = "Battery status",
                 icon = path_to_icons .. batteryType .. ".svg",
                 icon_size = dpi(16),
                 position = position,
                 timeout = 5, hover_timeout = 0.5,
-                width = 200,
+                width = 400,
                 screen = mouse.screen
             }
         end
