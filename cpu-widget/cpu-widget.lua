@@ -26,6 +26,7 @@ local HOME_DIR = os.getenv("HOME")
 local WIDGET_DIR = HOME_DIR .. '/.config/awesome/awesome-wm-widgets/cpu-widget'
 
 local cpu_widget = {}
+local turbo_widget = {}
 local cpu_rows = {
     spacing = 4,
     layout = wibox.layout.fixed.vertical,
@@ -238,6 +239,19 @@ local function worker(user_args)
         end
         awful.spawn.easy_async(cmd, function(stdout, _, _, _)
             if show_cpu_freq then
+                local turbo_fh = io.open("/sys/devices/system/cpu/intel_pstate/no_turbo", "r")
+                local no_turbo = turbo_fh:read()
+                turbo_fh:close()
+                local p_state = "Turbo P-states: enabled"
+                if no_turbo:find("1") then
+                    p_state = "Turbo P-states: disabled"
+                end
+                turbo_widget = wibox.widget{
+                    create_textbox{text = p_state, align = 'center'},
+                    layout  = wibox.layout.ratio.horizontal
+                }
+                turbo_widget:ajust_ratio(2, 0.2, 0.47, 0.33)
+
                 local n_minmax = 1
                 local n_cpu = 1
                 local n_core = 1
@@ -416,6 +430,13 @@ local function worker(user_args)
             if show_cpu_freq then
                 popup:setup {
                     {
+                        {
+                            orientation = 'horizontal',
+                            forced_height = 15,
+                            color = beautiful.bg_focus,
+                            widget = wibox.widget.separator
+                        },
+                        turbo_widget,
                         {
                             orientation = 'horizontal',
                             forced_height = 15,
